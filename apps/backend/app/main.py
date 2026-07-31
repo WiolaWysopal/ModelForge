@@ -1,13 +1,36 @@
+import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes.health import router as health_router
 from app.core.config import settings
 
+
+logger = logging.getLogger("uvicorn.error")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    logger.info("ModelForge API started successfully")
+    logger.info("\n")
+    logger.info("🚀 API: http://localhost:8000")
+    logger.info("🛠️  Swagger UI: http://localhost:8000/docs")
+    logger.info("❤️  Health check: http://localhost:8000/health")
+    logger.info("\n")
+
+    yield
+
+    logger.info("ModelForge API stopped")
+
+
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
     description="Backend API for the ModelForge MLOps platform.",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
