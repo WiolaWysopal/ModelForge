@@ -1,81 +1,153 @@
-# ModelForge
+# 🚀 ModelForge
 
-ModelForge is an MLOps platform for training, tracking, deploying, and monitoring machine learning models.
+> An open-source MLOps platform for training, tracking, deploying, and monitoring machine learning models.
 
-The project is designed to demonstrate practical software engineering, machine learning, and DevOps skills by providing an end-to-end workflow for managing ML experiments.
+ModelForge is a portfolio project that demonstrates how modern machine learning platforms are built using Python, FastAPI, React, Docker, PostgreSQL, and MLOps tools.
 
-## Tech Stack
+The long-term goal is to create an end-to-end platform for managing the complete machine learning lifecycle—from dataset management and experiment tracking to model deployment and monitoring.
 
-### Backend
+---
 
-- FastAPI
-- Python
-- PostgreSQL
+# ✨ Current Features
+* ✅ FastAPI backend
+* ✅ React + TypeScript frontend
+* ✅ Dockerized application
+* ✅ Docker Compose environment
+* ✅ PostgreSQL integration
+* ✅ Health Check API
+* ✅ Frontend ↔ Backend communication
+* ✅ Backend unit tests
 
-### Frontend
+---
 
-- React
-- TypeScript
+# 🛠 Tech Stack
 
-### Machine Learning
+## Backend
 
-- scikit-learn
-- NumPy
-- pandas
+* Python
+* FastAPI
+* Pydantic Settings
+* PostgreSQL
 
-### DevOps
+## Frontend
 
-- Docker
-- Kubernetes
-- GitHub Actions
+* React
+* TypeScript
+* Vite
 
-## Getting Started
+## Infrastructure
 
-### Backend
+* Docker
+* Docker Compose
 
-```bash
-cd apps/backend
+## Machine Learning*(planned)*
 
-python -m venv .venv
+* scikit-learn
+* MLflow
+* NumPy
+* pandas
 
-.\.venv\Scripts\Activate.ps1
+## DevOps*(planned)*
 
-pip install -r requirements.txt
+* GitHub Actions
+* Kubernetes
+* Prometheus
+* Grafana
 
-python -m uvicorn app.main:app --reload
-```
+---
 
-## Planned Features
+# 📂 Project Structure
 
-- Dataset management
-- Model training
-- Experiment tracking
-- Model registry
-- Prediction API
-- MLflow integration
-- Monitoring with Prometheus and Grafana
-
-## Project Structure
-
-```bash
+```text
 ModelForge/
 │
 ├── apps/
-│ ├── backend/
-│ └── frontend/
+│   ├── backend/
+│   └── frontend/
 │
 ├── infrastructure/
-│ ├── kubernetes/
-│ ├── mlflow/
-│ └── monitoring/
+│   ├── kubernetes/
+│   ├── mlflow/
+│   └── monitoring/
 │
 ├── data/
 ├── models/
 │
+├── docker-compose.yml
 └── README.md
 ```
 
+---
 
-## Status
+# 🚀 Getting Started
 
-🚧 Project under development.
+## Prerequisites
+
+* Docker Desktop
+* Docker Compose
+* Git
+
+---
+
+## Run the application
+
+Clone the repository:
+
+```bash
+git clone https://github.com/WiolaWysopal/ModelForge.git
+
+cd ModelForge
+```
+
+Start the entire platform:
+
+```bash
+docker compose up --build
+```
+
+---
+
+## Available Services
+
+| Service | URL |
+|----------|-----|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:8000 |
+| Swagger UI | http://localhost:8000/docs |
+| Health Check | http://localhost:8000/health |
+
+---
+
+# 🗺 Roadmap
+
+## Project Foundation ✅
+
+* FastAPI
+* React
+* PostgreSQL
+* Docker
+* Docker Compose
+* Backend tests
+
+## Planned
+
+* SQLAlchemy
+* Alembic
+* Authentication
+* Dataset Management
+* Experiment Tracking
+* Model Registry
+* Model Training
+* MLflow Integration
+* Model Deployment
+* Monitoring
+* CI/CD
+* Kubernetes
+
+---
+
+# 📌 Project Status
+
+🚧 **Under active development** 
+
+The project is being developed incrementally using feature branches and Pull Requests to simulate a professional software development workflow.
