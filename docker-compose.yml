@@ -1,0 +1,54 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: modelforge-postgres
+
+    environment:
+      POSTGRES_DB: modelforge
+      POSTGRES_USER: modelforge
+      POSTGRES_PASSWORD: modelforge
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U modelforge -d modelforge"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+
+    container_name: modelforge-backend
+
+    ports:
+      - "8000:8000"
+
+    env_file:
+      - ./apps/backend/.env
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+
+    container_name: modelforge-frontend
+
+    ports:
+      - "5173:5173"
+
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
