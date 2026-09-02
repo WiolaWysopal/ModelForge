@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     environment: str = "development"
     database_url: str
+    max_upload_size_mb: int = 10
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -2,6 +2,7 @@ from io import BytesIO
 
 from app.api.routes import datasets
 
+from app.core.config import settings
 
 def test_upload_dataset(client, tmp_path, monkeypatch):
     upload_dir = tmp_path / "datasets"
@@ -36,3 +37,41 @@ def test_upload_dataset(client, tmp_path, monkeypatch):
 
     assert saved_file.exists()
     assert saved_file.read_bytes() == csv_content
+
+def test_upload_rejects_non_csv_file(client):
+    response = client.post(
+        "/datasets/upload",
+        files={
+            "file": (
+                "notes.txt",
+                BytesIO(b"not a csv file"),
+                "text/plain",
+            )
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "Only CSV files are allowed."
+    }
+
+def test_upload_rejects_file_larger_than_limit(client, monkeypatch):
+    monkeypatch.setattr(settings, "max_upload_size_mb", 1)
+
+    oversized_content = b"a" * (1024 * 1024 + 1)
+
+    response = client.post(
+        "/datasets/upload",
+        files={
+            "file": (
+                "large.csv",
+                BytesIO(oversized_content),
+                "text/csv",
+            )
+        },
+    )
+
+    assert response.status_code == 413
+    assert response.json() == {
+        "detail": "File is too large. Maximum size is 1 MB."
+    }

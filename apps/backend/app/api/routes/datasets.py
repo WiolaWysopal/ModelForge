@@ -1,7 +1,7 @@
 from pathlib import Path
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -9,6 +9,7 @@ from app.models.dataset import Dataset
 
 from app.schemas.dataset import DatasetResponse
 
+from app.core.config import settings
 
 router = APIRouter(
     prefix="/datasets",
@@ -24,6 +25,22 @@ def upload_dataset(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
 ):
+    if file.filename is None or Path(file.filename).suffix.lower() != ".csv":
+        raise HTTPException(
+            status_code=400,
+            detail="Only CSV files are allowed.",
+        )
+    file.file.seek(0, 2)
+    file_size = file.file.tell()
+    file.file.seek(0)
+
+    max_size_bytes = settings.max_upload_size_mb * 1024 * 1024
+
+    if file_size > max_size_bytes:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File is too large. Maximum size is {settings.max_upload_size_mb} MB.",
+        )
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
     file_extension = Path(file.filename).suffix
