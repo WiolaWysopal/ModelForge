@@ -9,14 +9,24 @@ The long-term goal is to create an end-to-end platform for managing the complete
 ---
 
 # ✨ Current Features
+
 * ✅ FastAPI backend
 * ✅ React + TypeScript frontend
 * ✅ Dockerized application
 * ✅ Docker Compose environment
 * ✅ PostgreSQL integration
+* ✅ SQLAlchemy ORM
+* ✅ Alembic database migrations
 * ✅ Health Check API
 * ✅ Frontend ↔ Backend communication
 * ✅ Backend unit tests
+* ✅ CSV dataset upload
+* ✅ Dataset file type and size validation
+* ✅ Dataset metadata persistence
+* ✅ Automatic CSV analysis
+* ✅ Row and column counting
+* ✅ Missing value detection
+* ✅ Dataset preview API
 
 ---
 
@@ -27,7 +37,19 @@ The long-term goal is to create an end-to-end platform for managing the complete
 * Python
 * FastAPI
 * Pydantic Settings
+* SQLAlchemy
+* Alembic
 * PostgreSQL
+
+## Data Processing
+
+* pandas
+* NumPy
+
+## Machine Learning *(planned)*
+
+* scikit-learn
+* MLflow
 
 ## Frontend
 
@@ -40,14 +62,7 @@ The long-term goal is to create an end-to-end platform for managing the complete
 * Docker
 * Docker Compose
 
-## Machine Learning*(planned)*
-
-* scikit-learn
-* MLflow
-* NumPy
-* pandas
-
-## DevOps*(planned)*
+## DevOps *(planned)*
 
 * GitHub Actions
 * Kubernetes
@@ -115,34 +130,100 @@ docker compose up --build
 | Backend API | http://localhost:8000 |
 | Swagger UI | http://localhost:8000/docs |
 | Health Check | http://localhost:8000/health |
+| Dataset Upload | POST /datasets/upload |
+| Dataset Preview | GET /datasets/{dataset_id}/preview |
 
 ---
 
 # 🗺 Roadmap
 
-## Project Foundation ✅
+## PR 1 — Project Foundation ✅
 
-* FastAPI
-* React
+* FastAPI backend
+* React + TypeScript frontend
 * PostgreSQL
 * Docker
 * Docker Compose
+* Health Check API
+* Frontend ↔ Backend communication
 * Backend tests
 
-## Planned
+## PR 2 — Dataset Management ✅
 
-* SQLAlchemy
-* Alembic
+* SQLAlchemy ORM
+* Alembic migrations
+* CSV dataset upload
+* File type validation
+* File size validation
+* Dataset metadata persistence
+* Row and column counting
+* Missing value detection
+* Dataset preview
+
+## PR 3 — Training Pipeline
+
+* Target column selection
+* Train/test split
+* Data preprocessing
+* Algorithm selection
+* Model training
+* Model persistence with joblib
+
+## PR 4 — Experiment Tracking
+
+* Experiment history
+* Accuracy
+* Precision
+* Recall
+* F1-score
+* Training duration
+* Model parameters
+* Experiment comparison
+
+## PR 5 — Model Registry & Inference
+
+* Model versioning
+* Active model selection
+* Prediction API
+* Prediction testing from the UI
+
+## PR 6 — MLflow Integration
+
+* MLflow experiment tracking
+* Metrics and parameters logging
+* Model artifacts
+* MLflow UI
+
+## Future
+
 * Authentication
-* Dataset Management
-* Experiment Tracking
-* Model Registry
-* Model Training
-* MLflow Integration
-* Model Deployment
-* Monitoring
-* CI/CD
+* CI/CD with GitHub Actions
 * Kubernetes
+* Prometheus
+* Grafana
+* Model monitoring
+
+# 🔌 API
+
+## Upload Dataset
+
+```http
+POST /datasets/upload
+```
+
+Uploads a CSV dataset, validates the file, stores it, and calculates dataset metadata including:
+
+* number of rows
+* number of columns
+* number of missing values
+
+## Preview Dataset
+
+```http
+GET /datasets/{dataset_id}/preview
+```
+
+Returns dataset metadata, column names, and the first five rows of the uploaded dataset.
 
 ---
 

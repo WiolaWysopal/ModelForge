@@ -51,8 +51,9 @@ Thumbs.db
 # =========================
 # Project data
 # =========================
-data/*
-!data/.gitkeep
+# Uploaded datasets
+apps/backend/data/*
+!apps/backend/data/.gitkeep
 
 models/*
 !models/.gitkeep
