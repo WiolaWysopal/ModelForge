@@ -1,5 +1,6 @@
 from pathlib import Path
 from uuid import uuid4
+import pandas as pd
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
@@ -50,12 +51,18 @@ def upload_dataset(
     with file_path.open("wb") as destination:
         destination.write(file.file.read())
 
+    dataframe = pd.read_csv(file_path)
+
+    row_count = len(dataframe)
+    column_count = len(dataframe.columns)
+    missing_values_count = int(dataframe.isna().sum().sum())
+
     dataset = Dataset(
         filename=file.filename,
         file_path=str(file_path),
-        row_count=0,
-        column_count=0,
-        missing_values_count=0,
+        row_count=row_count,
+        column_count=column_count,
+        missing_values_count=missing_values_count,
     )
 
     db.add(dataset)

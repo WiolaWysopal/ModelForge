@@ -26,12 +26,12 @@ def test_upload_dataset(client, tmp_path, monkeypatch):
     data = response.json()
 
     assert data["filename"] == "test_dataset.csv"
-    assert data["row_count"] == 0
-    assert data["column_count"] == 0
+    assert data["row_count"] == 2
+    assert data["column_count"] == 3
     assert data["missing_values_count"] == 0
     assert "id" in data
     assert "file_path" in data
-    assert "created_at" in data
+    assert "created_at" in data 
 
     saved_file = tmp_path / data["file_path"]
 
@@ -75,3 +75,28 @@ def test_upload_rejects_file_larger_than_limit(client, monkeypatch):
     assert response.json() == {
         "detail": "File is too large. Maximum size is 1 MB."
     }
+
+def test_upload_dataset_detects_missing_values(client, tmp_path, monkeypatch):
+    upload_dir = tmp_path / "datasets"
+    monkeypatch.setattr(datasets, "UPLOAD_DIR", upload_dir)
+
+    csv_content = b"name,age,city\nAnna,25,Warsaw\nTom,,London\nKate,30,\n"
+
+    response = client.post(
+        "/datasets/upload",
+        files={
+            "file": (
+                "missing_values.csv",
+                BytesIO(csv_content),
+                "text/csv",
+            )
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["row_count"] == 3
+    assert data["column_count"] == 3
+    assert data["missing_values_count"] == 2
