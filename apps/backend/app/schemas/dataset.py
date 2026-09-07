@@ -13,3 +13,9 @@ class DatasetResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+class DatasetPreviewResponse(BaseModel):
+    dataset_id: int
+    filename: str
+    columns: list[str]
+    rows: list[dict]

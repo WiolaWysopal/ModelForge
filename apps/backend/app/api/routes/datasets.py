@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.dataset import Dataset
 
-from app.schemas.dataset import DatasetResponse
+from app.schemas.dataset import DatasetPreviewResponse, DatasetResponse
 
 from app.core.config import settings
 
@@ -70,3 +70,27 @@ def upload_dataset(
     db.refresh(dataset)
 
     return dataset
+
+@router.get("/{dataset_id}/preview", response_model=DatasetPreviewResponse)
+def preview_dataset(
+    dataset_id: int,
+    db: Session = Depends(get_db),
+):
+    dataset = db.get(Dataset, dataset_id)
+
+    if dataset is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Dataset not found.",
+        )
+
+    dataframe = pd.read_csv(dataset.file_path)
+
+    preview = dataframe.head(5)
+
+    return {
+        "dataset_id": dataset.id,
+        "filename": dataset.filename,
+        "columns": preview.columns.tolist(),
+        "rows": preview.to_dict(orient="records"),
+    }
