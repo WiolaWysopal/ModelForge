@@ -1,16 +1,18 @@
 from dataclasses import dataclass
-from sklearn.model_selection import train_test_split
+from pathlib import Path
+from uuid import uuid4
 
+import joblib
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from app.schemas.training import Algorithm
-
 
 @dataclass
 class TrainingData:
@@ -113,3 +115,16 @@ def train_model(
     pipeline.fit(X_train, y_train)
 
     return pipeline
+
+def save_model(
+    pipeline: Pipeline,
+    output_dir: Path = Path("data/models"),
+) -> str:
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    model_filename = f"{uuid4()}.joblib"
+    model_path = output_dir / model_filename
+
+    joblib.dump(pipeline, model_path)
+
+    return str(model_path)

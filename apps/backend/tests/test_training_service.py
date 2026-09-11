@@ -1,12 +1,13 @@
+from pathlib import Path
 import pandas as pd
 import pytest
 
 from app.services.training import (
     build_model_pipeline,
     prepare_training_data,
+    save_model,
     train_model,
 )
-
 
 def test_prepare_training_data_splits_dataset():
     dataframe = pd.DataFrame(
@@ -154,3 +155,31 @@ def test_train_model_returns_fitted_pipeline():
 
     assert isinstance(pipeline, Pipeline)
     assert len(predictions) == len(training_data.X_test)
+
+def test_save_model_creates_joblib_file(tmp_path):
+    dataframe = pd.DataFrame(
+        {
+            "feature": range(10),
+            "target": [0, 1] * 5,
+        }
+    )
+
+    training_data = prepare_training_data(
+        dataframe=dataframe,
+        target_column="target",
+        test_size=0.2,
+    )
+
+    pipeline = train_model(
+        X_train=training_data.X_train,
+        y_train=training_data.y_train,
+        algorithm=Algorithm.RANDOM_FOREST,
+    )
+
+    model_path = save_model(
+        pipeline=pipeline,
+        output_dir=tmp_path,
+    )
+
+    assert model_path.endswith(".joblib")
+    assert Path(model_path).exists()
