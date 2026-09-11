@@ -1,7 +1,11 @@
 import pandas as pd
 import pytest
 
-from app.services.training import prepare_training_data
+from app.services.training import (
+    build_model_pipeline,
+    prepare_training_data,
+    train_model,
+)
 
 
 def test_prepare_training_data_splits_dataset():
@@ -72,3 +76,81 @@ def test_prepare_training_data_rejects_dataset_without_features():
             target_column="target",
             test_size=0.2,
         )
+
+from sklearn.pipeline import Pipeline
+
+from app.schemas.training import Algorithm
+from app.services.training import build_model_pipeline
+
+
+def test_build_model_pipeline_for_logistic_regression():
+    dataframe = pd.DataFrame(
+        {
+            "age": [20, 30, 40],
+            "city": ["Krakow", "Warsaw", "Krakow"],
+        }
+    )
+
+    pipeline = build_model_pipeline(
+        X=dataframe,
+        algorithm=Algorithm.LOGISTIC_REGRESSION,
+    )
+
+    assert isinstance(pipeline, Pipeline)
+    assert "preprocessor" in pipeline.named_steps
+    assert "model" in pipeline.named_steps
+    assert pipeline.named_steps["model"].__class__.__name__ == "LogisticRegression"
+
+
+def test_build_model_pipeline_for_random_forest():
+    dataframe = pd.DataFrame(
+        {
+            "age": [20, 30, 40],
+            "city": ["Krakow", "Warsaw", "Krakow"],
+        }
+    )
+
+    pipeline = build_model_pipeline(
+        X=dataframe,
+        algorithm=Algorithm.RANDOM_FOREST,
+    )
+
+    assert isinstance(pipeline, Pipeline)
+    assert pipeline.named_steps["model"].__class__.__name__ == "RandomForestClassifier"
+
+def test_train_model_returns_fitted_pipeline():
+    dataframe = pd.DataFrame(
+        {
+            "age": [20, 22, 25, 28, 30, 35, 40, 45, 50, 55],
+            "city": [
+                "Krakow",
+                "Warsaw",
+                "Krakow",
+                "Warsaw",
+                "Krakow",
+                "Warsaw",
+                "Krakow",
+                "Warsaw",
+                "Krakow",
+                "Warsaw",
+            ],
+            "target": [0, 0, 0, 0, 1, 1, 1, 1, 1, 1],
+        }
+    )
+
+    training_data = prepare_training_data(
+        dataframe=dataframe,
+        target_column="target",
+        test_size=0.2,
+    )
+
+    pipeline = train_model(
+        X_train=training_data.X_train,
+        y_train=training_data.y_train,
+        algorithm=Algorithm.RANDOM_FOREST,
+    )
+
+    predictions = pipeline.predict(training_data.X_test)
+
+    assert isinstance(pipeline, Pipeline)
+    assert len(predictions) == len(training_data.X_test)
