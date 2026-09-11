@@ -4,7 +4,7 @@
 
 ModelForge is a portfolio project that demonstrates how modern machine learning platforms are built using Python, FastAPI, React, Docker, PostgreSQL, and MLOps tools.
 
-The long-term goal is to create an end-to-end platform for managing the complete machine learning lifecycle—from dataset management and experiment tracking to model deployment and monitoring.
+The long-term goal is to create an end-to-end platform for managing the complete machine learning lifecycle—from dataset management and model training to experiment tracking, deployment, and monitoring.
 
 ---
 
@@ -17,9 +17,10 @@ The long-term goal is to create an end-to-end platform for managing the complete
 * ✅ PostgreSQL integration
 * ✅ SQLAlchemy ORM
 * ✅ Alembic database migrations
+* ✅ Automatic database migrations on backend startup
 * ✅ Health Check API
 * ✅ Frontend ↔ Backend communication
-* ✅ Backend unit tests
+* ✅ Backend unit and API tests
 * ✅ CSV dataset upload
 * ✅ Dataset file type and size validation
 * ✅ Dataset metadata persistence
@@ -27,6 +28,16 @@ The long-term goal is to create an end-to-end platform for managing the complete
 * ✅ Row and column counting
 * ✅ Missing value detection
 * ✅ Dataset preview API
+* ✅ Target column selection
+* ✅ Train/test dataset splitting
+* ✅ Numeric and categorical feature preprocessing
+* ✅ Missing value imputation
+* ✅ Numeric feature scaling
+* ✅ Categorical feature encoding
+* ✅ Logistic Regression training
+* ✅ Random Forest training
+* ✅ Trained model persistence with joblib
+* ✅ Model Training API
 
 ---
 
@@ -36,6 +47,7 @@ The long-term goal is to create an end-to-end platform for managing the complete
 
 * Python
 * FastAPI
+* Pydantic
 * Pydantic Settings
 * SQLAlchemy
 * Alembic
@@ -46,9 +58,13 @@ The long-term goal is to create an end-to-end platform for managing the complete
 * pandas
 * NumPy
 
-## Machine Learning *(planned)*
+## Machine Learning
 
 * scikit-learn
+* joblib
+
+### Planned
+
 * MLflow
 
 ## Frontend
@@ -78,15 +94,24 @@ ModelForge/
 │
 ├── apps/
 │   ├── backend/
+│   │   ├── alembic/
+│   │   ├── app/
+│   │   │   ├── api/
+│   │   │   ├── core/
+│   │   │   ├── models/
+│   │   │   ├── schemas/
+│   │   │   └── services/
+│   │   ├── data/
+│   │   │   ├── datasets/
+│   │   │   └── models/
+│   │   └── tests/
+│   │
 │   └── frontend/
 │
 ├── infrastructure/
 │   ├── kubernetes/
 │   ├── mlflow/
 │   └── monitoring/
-│
-├── data/
-├── models/
 │
 ├── docker-compose.yml
 └── README.md
@@ -110,7 +135,6 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/WiolaWysopal/ModelForge.git
-
 cd ModelForge
 ```
 
@@ -120,18 +144,21 @@ Start the entire platform:
 docker compose up --build
 ```
 
+Database migrations are applied automatically before the backend starts.
+
 ---
 
 ## Available Services
 
-| Service | URL |
-|----------|-----|
+| Service | URL / Endpoint |
+|----------|----------------|
 | Frontend | http://localhost:5173 |
 | Backend API | http://localhost:8000 |
 | Swagger UI | http://localhost:8000/docs |
-| Health Check | http://localhost:8000/health |
+| Health Check | GET /health |
 | Dataset Upload | POST /datasets/upload |
 | Dataset Preview | GET /datasets/{dataset_id}/preview |
+| Model Training | POST /training |
 
 ---
 
@@ -160,14 +187,22 @@ docker compose up --build
 * Missing value detection
 * Dataset preview
 
-## PR 3 — Training Pipeline
+## PR 3 — Training Pipeline ✅
 
 * Target column selection
 * Train/test split
-* Data preprocessing
+* Numeric and categorical data preprocessing
+* Missing value imputation
+* Numeric feature scaling
+* Categorical feature encoding
 * Algorithm selection
+* Logistic Regression
+* Random Forest
 * Model training
 * Model persistence with joblib
+* Training API endpoint
+* Training pipeline tests
+* Automatic database migrations on Docker startup
 
 ## PR 4 — Experiment Tracking
 
@@ -203,6 +238,8 @@ docker compose up --build
 * Grafana
 * Model monitoring
 
+---
+
 # 🔌 API
 
 ## Upload Dataset
@@ -225,10 +262,59 @@ GET /datasets/{dataset_id}/preview
 
 Returns dataset metadata, column names, and the first five rows of the uploaded dataset.
 
+## Train Model
+
+```http
+POST /training
+```
+
+Trains a machine learning model using a previously uploaded dataset.
+
+Example request:
+
+```json
+{
+  "dataset_id": 1,
+  "target_column": "category",
+  "algorithm": "random_forest",
+  "test_size": 0.2
+}
+```
+
+The training pipeline:
+
+1. loads the selected dataset,
+2. separates features from the target column,
+3. creates the train/test split,
+4. preprocesses numeric and categorical features,
+5. trains the selected algorithm,
+6. persists the fitted pipeline as a `.joblib` model artifact.
+
+Currently supported algorithms:
+
+* `logistic_regression`
+* `random_forest`
+
+Example response:
+
+```json
+{
+  "dataset_id": 1,
+  "target_column": "category",
+  "algorithm": "random_forest",
+  "test_size": 0.2,
+  "train_size": 80,
+  "test_size_rows": 20,
+  "model_path": "data/models/<model-id>.joblib"
+}
+```
+
 ---
 
 # 📌 Project Status
 
-🚧 **Under active development** 
+🚧 **Under active development**
 
 The project is being developed incrementally using feature branches and Pull Requests to simulate a professional software development workflow.
+
+PR 1 established the project foundation, PR 2 introduced dataset management, and PR 3 adds the first end-to-end machine learning training pipeline. The next development stage focuses on experiment tracking and model evaluation.
